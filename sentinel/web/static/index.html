@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelGate | Third-Party API Access Security (Harbor & Finch)</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+    <!-- Cyber Floating Toast Alerts Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Header Navbar -->
+    <header class="navbar">
+        <div class="logo-area">
+            <span class="shield-icon">🛡️</span>
+            <div>
+                <span class="brand-title">SentinelGate</span>
+                <span class="brand-badge">Harbor & Finch Cyber Sentinel v1.3</span>
+            </div>
+        </div>
+
+        <div class="nav-controls">
+            <!-- Gateway Enforcement Mode -->
+            <div class="mode-selector">
+                <span>Gateway Guard:</span>
+                <button class="btn-mode active-monitor" data-mode="MONITOR" title="Passive monitoring of excessive scopes">Monitor</button>
+                <button class="btn-mode" data-mode="ENFORCE" title="Strict Least-Privilege Active Enforcement (HTTP 403)">Enforce</button>
+                <button class="btn-mode" data-mode="REDACT" title="Transparent Field Redaction of PII & Compensation">Redact</button>
+            </div>
+
+            <!-- Sound Feedback Toggle -->
+            <button class="btn-sound active" id="btnToggleSound" title="Toggle Cyber Audio Feedback">
+                🔊 Audio: ON
+            </button>
+
+            <!-- Global Action Buttons -->
+            <button class="btn-action" id="btnSimulateTraffic">
+                ⚡ Inject API Traffic
+            </button>
+            <button class="btn-action btn-primary" id="btnRefreshAll">
+                🔄 Sync Radar
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Live Threat Radar & Cyber Attack Stimulation Bar -->
+        <div class="threat-radar-bar">
+            <div class="radar-status">
+                <span class="radar-dot"></span>
+                <span>CYBER THREAT RADAR ACTIVE: <span id="radarStatusText">SURVEILLANCE MODE</span></span>
+            </div>
+            <div class="attack-triggers">
+                <span style="font-size:11px; color:var(--text-muted); align-self:center; margin-right:4px; font-weight:700;">TRIGGER ATTACK VECTORS:</span>
+                <button class="btn-trigger" onclick="simulateSpecificAttack('salary')">💥 Salary Exfiltration</button>
+                <button class="btn-trigger" onclick="simulateSpecificAttack('harbor')">🚨 Image Poisoning</button>
+                <button class="btn-trigger" onclick="simulateSpecificAttack('wire')">⚡ Direct Deposit Tampering</button>
+            </div>
+        </div>
+
+        <!-- Overview Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">Third-Party Integrations</div>
+                <div class="metric-value" id="metricIntegrations">6</div>
+                <div class="metric-sub">Harbor & Finch ecosystems</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Over-Privileged Tokens</div>
+                <div class="metric-value" id="metricOverpriv" style="color: var(--neon-red-bright); text-shadow: 0 0 12px var(--neon-red-glow);">5</div>
+                <div class="metric-sub">Violating Least Privilege</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Critical Security Threats</div>
+                <div class="metric-value" id="metricCritical" style="color: #ff0055; text-shadow: 0 0 16px var(--neon-red);">3</div>
+                <div class="metric-sub">Superuser / PII / Financial leaks</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Blocked Rogue Requests</div>
+                <div class="metric-value" id="metricBlocked" style="color: var(--neon-cyan); text-shadow: 0 0 12px var(--neon-cyan-glow);">0</div>
+                <div class="metric-sub">Intercepted by Sentinel Gateway</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Avg Privilege Excess Ratio</div>
+                <div class="metric-value" id="metricAvgExcess" style="color: var(--neon-amber); text-shadow: 0 0 12px var(--neon-amber-glow);">68.4%</div>
+                <div class="metric-sub">Over-privilege gap across tokens</div>
+            </div>
+        </div>
+
+        <!-- Tabbed Navigation -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="audits">📋 Integrations & Gap Audits</button>
+            <button class="tab-btn" data-tab="demonstrate">🔬 Demonstrate Excessive Access</button>
+            <button class="tab-btn" data-tab="blastradius">🌐 Interactive Blast Radius</button>
+            <button class="tab-btn" data-tab="remediation">🛡️ Least-Privilege Remediation</button>
+            <button class="tab-btn" data-tab="logs">📡 Real-Time Gateway Telemetry</button>
+        </div>
+
+        <!-- Tab 1: Gap Audits -->
+        <div class="tab-content" id="tab-audits">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>Third-Party API Access Audit & Permission Divergence Matrix</span>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="auditSearchInput" placeholder="🔍 Search integrations, scopes, vendors..." 
+                               style="background:#09020b; border:1px solid var(--border-neon); color:#fff; padding:6px 14px; border-radius:6px; font-size:12px; width:260px;">
+                        <div class="filter-bar">
+                            <button class="filter-btn active" data-filter="ALL">All Systems</button>
+                            <button class="filter-btn" data-filter="FINCH">Finch HRIS</button>
+                            <button class="filter-btn" data-filter="HARBOR">Harbor Registry</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Integration / Client</th>
+                                <th>System</th>
+                                <th>Permissions Granted vs Active (<span style="color:#00ff88;">Used</span> / <span style="color:#ff0055;">Excess</span>)</th>
+                                <th>Excess Gap</th>
+                                <th>Risk Score</th>
+                                <th>Primary Threat Vector</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditsTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Demonstration Studio -->
+        <div class="tab-content" id="tab-demonstrate" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>Proof-of-Excess Security Demonstration Studio</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:700;">Target Integration:</span>
+                        <select id="demoSelectCred" style="background:#09020b; color:#fff; border:1px solid var(--border-neon); padding:6px 12px; border-radius:6px; font-size:12px;">
+                            <!-- Populated dynamically -->
+                        </select>
+                        <button class="btn-action btn-primary" id="btnRunDemoManual">⚡ Execute Demonstration</button>
+                    </div>
+                </div>
+
+                <!-- Simulation HUD Terminal -->
+                <div class="sim-terminal" id="demoTerminal" style="display:none;">
+                    <div class="sim-line"><span>[SYSTEM]</span> <span id="termLine1">Ready to execute demonstration exploit.</span></div>
+                    <div class="sim-line"><span>[SECURITY]</span> <span id="termLine2">Analyzing token credentials and target boundary...</span></div>
+                    <div class="sim-line alert"><span>[RADAR]</span> <span id="termLine3">Vulnerability confirmed.</span></div>
+                </div>
+
+                <div id="demoResultsContainer">
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        Select an integration from the dropdown above or click <strong>'Demo Risk'</strong> in the audit matrix to execute the live proof-of-excess simulation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Interactive Blast Radius Visualizer -->
+        <div class="tab-content" id="tab-blastradius" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>Dynamic Attack Surface & Blast Radius Simulation</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:12px; color:var(--text-muted); font-weight:700;">Focus Credential:</span>
+                        <select id="blastSelectCred" style="background:#09020b; color:#fff; border:1px solid var(--border-neon); padding:6px 12px; border-radius:6px; font-size:12px;">
+                            <!-- Populated dynamically -->
+                        </select>
+                        <button class="btn-action" onclick="resetCanvasPhysics()">⟲ Reset Physics</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:14px; display:flex; gap:18px; font-size:12px; color:var(--text-muted); flex-wrap:wrap;">
+                    <span><span style="display:inline-block; width:12px; height:12px; background:#00f0ff; border-radius:50%; margin-right:4px; box-shadow:0 0 8px #00f0ff;"></span> Client Token</span>
+                    <span><span style="display:inline-block; width:12px; height:12px; background:#00ff88; border-radius:50%; margin-right:4px; box-shadow:0 0 8px #00ff88;"></span> Legitimate Scope</span>
+                    <span><span style="display:inline-block; width:12px; height:12px; background:#ff0055; border-radius:50%; margin-right:4px; box-shadow:0 0 8px #ff0055;"></span> Excessive / Unused Scope</span>
+                    <span><span style="display:inline-block; width:12px; height:12px; background:#ff9900; border-radius:50%; margin-right:4px; box-shadow:0 0 8px #ff9900;"></span> Vulnerable Data Asset</span>
+                    <span><span style="display:inline-block; width:12px; height:12px; background:#dc2626; border-radius:50%; margin-right:4px; box-shadow:0 0 10px #dc2626;"></span> Critical Exploit Impact</span>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <canvas id="blastCanvas"></canvas>
+                    <div class="canvas-hint">⚡ Interactive Physics Engine: Drag nodes to inspect live attack pathways & data packet flow</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Remediation & Policy Downscoper -->
+        <div class="tab-content" id="tab-remediation" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>Automated Least-Privilege Policy Synthesizer & Scope Tuner</span>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span id="planHeaderClient" style="font-size:13px; font-weight:800; color:var(--neon-cyan); align-self:center;"></span>
+                        <button class="btn-action" id="btnRollbackPlan" disabled>↩ Rollback Original</button>
+                        <button class="btn-action btn-primary" id="btnApplyPlan" disabled>🛡️ Apply Least-Privilege Policy</button>
+                    </div>
+                </div>
+
+                <!-- Interactive Live Scope Tuner Sandbox -->
+                <div class="tuner-card" id="scopeTunerSection" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h4 style="color:#fff; font-size:14px; text-transform:uppercase; letter-spacing:0.5px;">Interactive Scope Tuner (Live Risk Sandbox)</h4>
+                            <span style="font-size:12px; color:var(--text-muted);">Toggle permissions on/off to simulate impact on the security score in real-time:</span>
+                        </div>
+                        <div style="display:flex; gap:16px;">
+                            <div style="text-align:right;">
+                                <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Simulated Risk</div>
+                                <div id="liveTunerRisk" style="font-size:22px; font-weight:800; color:#ff0055;">--</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">Excess Ratio</div>
+                                <div id="liveTunerExcess" style="font-size:22px; font-weight:800; color:var(--neon-amber);">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="scope-checkbox-list" id="tunerCheckboxList">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <div id="remediationContainer">
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        Select an integration and click <strong>'Remediate'</strong> in the audit table to generate a least-privilege plan.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 5: Live Gateway Telemetry -->
+        <div class="tab-content" id="tab-logs" style="display:none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>Real-Time API Gateway Interception & Audit Telemetry</span>
+                    </div>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <input type="text" id="logSearchInput" placeholder="🔍 Filter endpoint, client, IP..." 
+                               style="background:#09020b; border:1px solid var(--border-neon); color:#fff; padding:6px 14px; border-radius:6px; font-size:12px; width:220px;">
+                        <span style="font-size:11px; color:var(--neon-green); font-weight:700;">● STREAMING TELEMETRY</span>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Client Name</th>
+                                <th>System</th>
+                                <th>Request (Method & Path)</th>
+                                <th>Scope Matched</th>
+                                <th>Status / Gateway Action</th>
+                                <th>Data Redactions</th>
+                                <th>Threat Indicator</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
