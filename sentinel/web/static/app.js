@@ -1099,6 +1099,27 @@ async function rollbackCurrentPlan() {
     }
 }
 
+window.rollbackAllPolicies = async function() {
+    playCyberSound('laser');
+    try {
+        const res = await fetch('/api/remediation/rollback-all', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            playCyberSound('chime');
+            showCyberToast('ALL POLICIES RESTORED', data.message, 'blocked');
+            showRadarAlert('All least-privilege policies rolled back to original broad scopes.');
+            await refreshAll();
+            if (state.selectedCredId) {
+                startRemediation(state.selectedCredId);
+            }
+        } else {
+            showCyberToast('ROLLBACK ALL ERROR', data.error, 'danger');
+        }
+    } catch (err) {
+        showCyberToast('ROLLBACK ALL FAILED', err.message, 'danger');
+    }
+};
+
 // -------------------------------------------------------------
 // Real-Time Telemetry Stream
 // -------------------------------------------------------------

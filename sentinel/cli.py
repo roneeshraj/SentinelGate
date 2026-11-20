@@ -90,6 +90,19 @@ def cmd_demonstrate(args):
 
 def cmd_remediate(args):
     init_db()
+    if getattr(args, 'rollback_all', False):
+        res = Remediator.rollback_all()
+        print(f"\n{'='*75}")
+        print(f" [✓] {res['message']}")
+        for client in res.get('rolled_back_clients', []):
+            print(f"  [-] Restored original scopes for: {client}")
+        print(f"{'='*75}\n")
+        return
+
+    if not args.cred_id:
+        print("[!] Please specify --cred <cred_id> or --rollback-all")
+        sys.exit(1)
+
     plan = PolicyGenerator.generate_plan(args.cred_id)
     if not plan:
         print(f"[!] Credential '{args.cred_id}' not found.")
@@ -140,9 +153,10 @@ def main():
     p_demo.add_argument("--cred", dest="cred_id", required=True, help="Credential ID to demonstrate")
 
     # remediate
-    p_rem = subparsers.add_parser("remediate", help="Generate least-privilege remediation plan")
-    p_rem.add_argument("--cred", dest="cred_id", required=True, help="Credential ID to remediate")
+    p_rem = subparsers.add_parser("remediate", help="Generate least-privilege remediation plan or rollback")
+    p_rem.add_argument("--cred", dest="cred_id", help="Credential ID to remediate")
     p_rem.add_argument("--apply", action="store_true", help="Automatically apply remediation")
+    p_rem.add_argument("--rollback-all", action="store_true", help="Roll back all applied least-privilege policies")
 
     # mode
     p_mode = subparsers.add_parser("mode", help="View or update gateway enforcement mode")

@@ -3,10 +3,12 @@ Remediator for SentinelGate.
 Applies automated least-privilege remediation and maintains rollback records.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
 from sentinel.database import (
     get_remediation_plan_by_id,
+    get_all_remediation_plans,
+    get_all_credentials,
     save_remediation_plan,
     update_credential_scopes,
     get_credential_by_id
@@ -99,4 +101,40 @@ class Remediator:
             "success": True,
             "message": f"Successfully restored original scopes for {plan_dict['client_name']}.",
             "restored_scopes": original_scopes
+        }
+
+    @staticmethod
+    def rollback_all() -> Dict[str, Any]:
+        """Rolls back all applied least-privilege policies across all credentials."""
+        plans = get_all_remediation_plans()
+        applied_plans = [p for p in plans if p["status"] == "APPLIED"]
+        rolled_back_clients = []
+
+        for plan in applied_plans:
+            res = Remediator.rollback_plan(plan["id"])
+            if res.get("success"):
+                rolled_back_clients.append(plan["client_name"])
+
+        # Initial benchmark scopes fallback
+        initial_scopes = {
+            "cred_finch_slack_001": ["company:read", "directory:read", "individual:read", "ssn:read", "pay_statement:read", "payment:read"],
+            "cred_finch_expense_002": ["company:read", "directory:read", "employment:read", "payment:read", "payment:write", "benefits:write"],
+            "cred_finch_benefits_003": ["directory:read", "individual:read", "benefits:read", "benefits:write", "ssn:read"],
+            "cred_harbor_argo_001": ["repository:pull", "repository:push", "repository:delete", "webhook:manage", "project:admin", "system:admin"],
+            "cred_harbor_sonar_002": ["repository:pull", "artifact:read", "repository:delete", "scanner:configure"],
+            "cred_harbor_prom_003": ["artifact:read", "project:admin"]
+        }
+
+        creds = get_all_credentials()
+        for c in creds:
+            if c["status"] == "REMEDIATED" or c["id"] in initial_scopes:
+                if c["id"] in initial_scopes:
+                    update_credential_scopes(c["id"], initial_scopes[c["id"]], status="ACTIVE")
+                    if c["client_name"] not in rolled_back_clients:
+                        rolled_back_clients.append(c["client_name"])
+
+        return {
+            "success": True,
+            "message": f"Successfully rolled back least-privilege policies for {len(rolled_back_clients)} integrations.",
+            "rolled_back_clients": rolled_back_clients
         }

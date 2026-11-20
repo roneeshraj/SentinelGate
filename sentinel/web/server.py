@@ -127,6 +127,10 @@ class SentinelApiHandler(BaseHTTPRequestHandler):
                 res = Remediator.apply_plan(plan_id)
                 self._send_json(200 if res.get("success") else 400, res)
 
+            elif path == "/api/remediation/rollback-all":
+                res = Remediator.rollback_all()
+                self._send_json(200 if res.get("success") else 400, res)
+
             elif path.startswith("/api/remediation/rollback/"):
                 plan_id = path.replace("/api/remediation/rollback/", "")
                 res = Remediator.rollback_plan(plan_id)

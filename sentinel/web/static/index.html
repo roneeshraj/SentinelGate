@@ -208,9 +208,10 @@
                     <div class="card-title">
                         <span>Automated Least-Privilege Policy Synthesizer & Scope Tuner</span>
                     </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                         <span id="planHeaderClient" style="font-size:13px; font-weight:800; color:var(--neon-cyan); align-self:center;"></span>
-                        <button class="btn-action" id="btnRollbackPlan" disabled>↩ Rollback Original</button>
+                        <button class="btn-action btn-danger" onclick="rollbackAllPolicies()">↩ Rollback ALL Policies</button>
+                        <button class="btn-action" id="btnRollbackPlan" disabled>↩ Rollback Client</button>
                         <button class="btn-action btn-primary" id="btnApplyPlan" disabled>🛡️ Apply Least-Privilege Policy</button>
                     </div>
                 </div>
